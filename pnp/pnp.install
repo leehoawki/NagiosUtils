@@ -1,0 +1,35 @@
+yum install -y rrdtool php-gd
+tar zxvf pnp4nagios-0.6.25.tar.gz
+cd pnp4nagios-0.6.25
+
+mkdir /usr/local/nagios/share/perfdata
+chown nagios:nagios /usr/local/nagios/share/perfdata
+
+./configure --with-nagios-user=nagios --with-nagios-group=nagios --with-rrdtoul=/usr/local/rrdtool/bin/rrdtool --with-perfdata-dir=/usr/local/nagios/share/perfdata
+make all
+make install
+make install-webconf
+make install-config
+make install-init
+
+cd ..
+cat nagios.cfg.part >> /usr/local/nagios/etc/nagios.cfg
+cat commands.cfg.part >> /usr/local/nagios/etc/objects/commands.cfg
+cat templates.cfg.part >> /usr/local/nagios/etc/objects/templates.cfg
+
+cd /usr/local/pnp4nagios/etc/
+mv misccommands.cfg-sample misccommands.cfg
+mv rra.cfg-sample rra.cfg
+mv nagios.cfg-sample nagios.cfg
+cd pages
+mv web_traffic.cfg-sample web_traffic.cfg
+cd ../check_commands
+mv check_all_local_disks.cfg-sample check_all_local_disks.cfg
+mv check_nrpe.cfg-sample check_nrpe.cfg
+mv check_nwstat.cfg-sample check_nwstat.cfg
+
+service npcd restart
+chkconfig npcd on
+
+echo "EDIT /usr/local/nagios/etc/host.cfg or service.cfg TO ADD PNP TAG"
+echo "DONT FORGET TO RESTART NAGIOS SERVICE TO ACTIVATE THE CHANGES UNDER ETC"

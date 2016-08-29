@@ -1,0 +1,47 @@
+yum install -y httpd php gcc glibc glibc-common gd gd-devel make net-snmp openssl-devel
+
+useradd nagios
+groupadd nagcmd
+usermod -G nagcmd nagios
+usermod -G nagcmd apache
+
+tar -xvf nagios-4.1.1.tar.gz
+tar -xvf nagios-plugins-2.1.1.tar.gz
+
+cd nagios-4.1.1
+./configure --with-command-group=nagcmd
+make all
+make install
+make install-init
+make install-commandmode
+make install-config
+
+
+make install-webconf
+htpasswd -bc /usr/local/nagios/etc/htpasswd.users nagiosadmin nagiosadmin
+service httpd start
+
+cd ../nagios-plugins-2.1.1
+./configure --with-nagios-user=nagios --with-nagios-group=nagios
+make
+make install
+
+chkconfig --add nagios
+chkconfig --level 35 nagios on
+chkconfig --add httpd
+chkconfig --level 35 httpd on
+service nagios start
+
+cd ..
+tar xzf nrpe-2.15.tar.gz
+cd nrpe-2.15
+./configure
+make all
+make install-daemon
+make install-plugin
+
+echo "EDIT /usr/local/nagios/etc/hosts.cfg TO ADD THE NEW HOSTS"
+echo "EDIT /usr/local/nagios/etc/services.cfg TO ADD THE NEW SERVICES"
+echo "EDIT /usr/local/nagios/etc/nagios.cfg TO ADD THE NEW CONFIG FILES"
+echo "EDIT /usr/local/nagios/etc/objects/commands.cfg TO REGISTER NEW COMMANDS"
+echo "AND RESTART THE NAGIOS SERVICE USING service nagios restart"

@@ -1,0 +1,45 @@
+#!/bin/bash
+w_r_val=30
+c_r_val=60
+
+w_w_val=30
+c_w_val=60
+
+# Doing the actual check:
+read_b=`sar -b | tail -n 2 | head -n 1 | awk '{print $(NF-1)}' | cut -d. -f1`
+write_b=`sar -b | tail -n 2 | head -n 1 | awk '{print $NF}' | cut -d. -f1`
+
+read=`expr $read_b / 256`
+write=`expr $write_b / 256`
+
+# Comparing the result and setting the correct level:
+if [[ $read -ge $c_r_val ]]; then
+        msg="CRITICAL"
+        status=2
+else if [[ $read -ge $w_r_val ]]; then
+        msg="WARNING"
+        status=1
+     else
+        msg="OK"
+        status=0
+     fi
+fi
+
+if [[ $write -ge $c_w_val ]]; then
+        msg="CRITICAL"
+        status=2
+else if [[ $write -ge $w_w_val  && $status -le 1 ]]; then
+        msg="WARNING"
+        status=1
+    else if [[ $status -le 0 ]]; then
+        msg="OK"
+        status=0
+         fi 
+     fi
+fi
+
+# Printing the results:
+echo "$msg - IO read=$read write=$write | read=$read;$w_r_val;$c_r_val write=$write;$w_w_val;$c_w_val;"
+
+# Bye!
+exit $status

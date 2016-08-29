@@ -1,0 +1,30 @@
+yum install -y gcc glibc glibc-common gd make net-snmp openssl-devel
+
+useradd nagios
+tar xvf nagios-plugins-2.1.1.tar.gz
+# ~/nagios-plugins-2.1.1
+cd nagios-plugins-2.1.1
+./configure
+make
+make install
+chown nagios.nagios /usr/local/nagios
+chown -R nagios.nagios /usr/local/nagios/libexec
+
+# ~
+cd ..
+
+yum install -y xinetd
+tar xzf nrpe-2.15.tar.gz
+
+# ~/nrpe-2.15
+cd nrpe-2.15
+./configure
+make all
+make install-plugin
+make install-daemon
+make install-daemon-config
+make install-xinetd
+echo "nrpe      5666/tcp        NRPE" >> /etc/services
+
+echo "PLEASE EDIT /etc/xinetd.d/nrpe TO ADD YOUR NAGIOS SERVER"
+echo "AND RESTART THE XINETD SERVICE USING service xinetd restart"

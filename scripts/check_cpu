@@ -1,0 +1,26 @@
+#!/bin/bash
+w_val=40
+c_val=60
+
+# Doing the actual check:
+idle=`sar | tail -n 2 | head -n 1 | awk '{print $NF}' | cut -d. -f1`
+used=`expr 100 - $idle`
+
+# Comparing the result and setting the correct level:
+if [[ $used -ge $c_val ]]; then
+        msg="CRITICAL"
+        status=2
+else if [[ $used -ge $w_val ]]; then
+        msg="WARNING"
+        status=1
+     else
+        msg="OK"
+        status=0
+     fi
+fi
+
+# Printing the results:
+echo "$msg - CPU used=$used% idle=$idle% | Usage=$used;$w_val;$c_val;"
+
+# Bye!
+exit $status

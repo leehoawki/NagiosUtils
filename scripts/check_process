@@ -1,0 +1,24 @@
+#!/bin/bash
+process=$1
+numbers=$2
+
+# Doing the actual check:
+count=`ps -ef | grep $process | grep -v check_proces | grep -v grep | wc -l`
+
+
+# Comparing the result and setting the correct level:
+if [[ $count -lt $numbers ]]; then
+        msg="CRITICAL"
+        status=2
+else if [[ $count -gt $numbers ]]; then
+        msg="WARNING"
+        status=1
+     else
+        msg="OK"
+        status=0
+     fi
+fi
+# Printing the results:
+echo "$msg - Process $process Numbers=$count | 'Process status'=$count;$numbers;"
+# Bye!
+exit $status
