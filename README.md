@@ -14,4 +14,4 @@ Installation script for client side daemon.
 **cfg.part file** Configuration files needed in the installation.
 
 ### scripts 
-Plguins to gather data from target server.
+Plugins to gather data from target server.
